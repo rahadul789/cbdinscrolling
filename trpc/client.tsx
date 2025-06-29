@@ -1,5 +1,7 @@
 "use client";
 // ^-- to make sure we can mount the Provider from a server component
+import superjson from "superjson";
+
 import type { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
@@ -40,8 +42,15 @@ export function TRPCProvider(
     trpc.createClient({
       links: [
         httpBatchLink({
-          // transformer: superjson, <-- if you use a data transformer
+          transformer: superjson, //<-- if you use a data transformer
           url: getUrl(),
+          // nicher headers line ta add korsi , eta mayb login improvement er jonno ,cwa also not much sure aabout it
+          // it will be helpful for loggin and debugging
+          async headers() {
+            const headers = new Headers();
+            headers.set("X-trpc-source", "nextjs-react");
+            return headers;
+          },
         }),
       ],
     })

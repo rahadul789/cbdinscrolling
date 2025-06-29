@@ -4,7 +4,7 @@ import { trpc } from "@/trpc/client";
 
 const Client = () => {
   const [data] = trpc.hello.useSuspenseQuery({
-    text: "Chatgpt bd",
+    text: "Reason2",
   });
   return <div>{data.greeting}</div>;
 };
