@@ -7,7 +7,15 @@
 //   email: varchar({ length: 255 }).notNull().unique(),
 // });
 
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  uuid,
+  jsonb,
+  timestamp,
+  boolean,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -68,3 +76,21 @@ export const verification = pgTable("verification", {
     () => /* @__PURE__ */ new Date()
   ),
 });
+/////////////////////////////////////////////////////////////////////////
+
+export const chats = pgTable(
+  "chats",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    messages: text("messages").notNull(),
+    // Store images as a JSON array of image objects
+    images: jsonb("images").$type<string[]>().default([]),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  }
+  // (t) => [uniqueIndex("title_index").on(t.title)]
+);
