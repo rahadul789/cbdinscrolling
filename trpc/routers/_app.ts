@@ -1,14 +1,15 @@
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 import { TRPCError } from "@trpc/server";
 export const appRouter = createTRPCRouter({
-  hello: baseProcedure
+  hello: protectedProcedure
     .input(
       z.object({
         text: z.string(),
       })
     )
     .query((opts) => {
+      console.log(opts);
       return {
         greeting: `hello ${opts.input.text}`,
       };
