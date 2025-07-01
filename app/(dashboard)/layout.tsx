@@ -1,7 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { DashbarNavbar } from "@/modules/dashboard/ui/components/dashboard-navbar";
-import { DashboardSidebar } from "@/modules/dashboard/ui/components/dashboard-sidebar";
+import DashboardSidebarView from "@/modules/dashboard/ui/views/dashboard-sidebar-view";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
@@ -20,7 +20,7 @@ const Layout = async ({ children }: Props) => {
   }
   return (
     <SidebarProvider>
-      <DashboardSidebar />
+      <DashboardSidebarView />
       <main className=" flex flex-col h-screen w-screen bg-muted">
         <DashbarNavbar />
         {children}

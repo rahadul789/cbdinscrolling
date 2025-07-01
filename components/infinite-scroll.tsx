@@ -1,6 +1,9 @@
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
 import { useEffect } from "react";
 import { Button } from "./ui/button";
+import { SidebarMenuButton, SidebarMenuItem } from "./ui/sidebar";
+import { LucideMoreHorizontal } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface InfiniteScrollProps {
   isManual?: boolean;
@@ -33,21 +36,34 @@ export const InfiniteScroll = ({
   ]);
 
   return (
-    <div className=" flex flex-col items-center gap-4 p-4">
+    <div className=" ">
       <div ref={targetRef} className="h1" />
-      {hasNextPage ? (
-        <Button
-          variant="secondary"
-          disabled={!hasNextPage || isFetchingNextPage}
-          onClick={() => fetchNextPage()}
-        >
-          {isFetchingNextPage ? "Loading..." : "Load more"}
-        </Button>
-      ) : (
-        <p className=" text-xs text-muted-foreground">
-          You have reached the end of the list
-        </p>
-      )}
+
+      <SidebarMenuItem>
+        {hasNextPage ? (
+          <SidebarMenuButton asChild className={cn("h-10 cursor-pointer")}>
+            <Button
+              variant="secondary"
+              disabled={!hasNextPage || isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+              className=" w-full justify-start ml-0 pl-2 bg-transparent"
+            >
+              {isFetchingNextPage ? (
+                "Loading..."
+              ) : (
+                <div className=" flex items-center gap-2">
+                  <LucideMoreHorizontal size={16} className=" " />
+                  See more
+                </div>
+              )}
+            </Button>
+          </SidebarMenuButton>
+        ) : (
+          <p className=" text-xs text-muted-foreground">
+            You have reached the end of the list
+          </p>
+        )}
+      </SidebarMenuItem>
     </div>
   );
 };
