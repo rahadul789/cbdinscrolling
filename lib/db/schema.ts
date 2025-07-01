@@ -7,6 +7,7 @@
 //   email: varchar({ length: 255 }).notNull().unique(),
 // });
 
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -32,6 +33,11 @@ export const user = pgTable("user", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+  chats: many(chats),
+  // projects: many(projects), eta ami add korsi, future a lagbe
+}));
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
@@ -78,19 +84,55 @@ export const verification = pgTable("verification", {
 });
 /////////////////////////////////////////////////////////////////////////
 
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull().unique(),
+    description: text("description"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("name_idx").on(t.name)]
+);
+
+export const projectRelations = relations(user, ({ many }) => ({
+  chats: many(chats),
+}));
+
 export const chats = pgTable(
   "chats",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
     messages: text("messages").notNull(),
-    // Store images as a JSON array of image objects
     images: jsonb("images").$type<string[]>().default([]),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    projectId: uuid("project_id").references(() => projects.id, {
+      onDelete: "set null", // ekhane onDelete cascade hobe// check it in future // amra case cascade hobe
+    }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   }
   // (t) => [uniqueIndex("title_index").on(t.title)]
 );
+
+// ey nicher chatRelationc code na likhlew hobe
+export const chatRelations = relations(chats, ({ one }) => ({
+  user: one(user, {
+    fields: [chats.userId],
+    references: [user.id],
+  }),
+  project: one(projects, {
+    fields: [chats.projectId],
+    references: [projects.id],
+  }),
+}));
+
+// with relations can not work if i do not set relationship like avobes
+// If i choose normal realtion like join then i do not need this avobe realtions

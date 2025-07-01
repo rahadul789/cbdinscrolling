@@ -11,6 +11,14 @@ interface ChatSectionProps {
 }
 
 export const ChatSection = ({ chatId }: ChatSectionProps) => {
+  // store this for future
+  // const utils = trpc.useUtils()
+  // const create = trpc.chats.create.useMutation({
+  //     onSuccess: ()=>{
+  //         utils.chats.getMany.invalidate()
+  //     }
+  // })
+  // create.pending
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <ErrorBoundary fallback={<p>Error</p>}>
@@ -30,9 +38,19 @@ const ChatSectionSuspense = ({ chatId }: ChatSectionProps) => {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       }
     );
+
+  console.log(data);
   return (
     <div>
-      {JSON.stringify(data)}
+      {data.pages
+        .flatMap((page) => page.items)
+        .map((chat) => (
+          <div key={chat.id} className=" border py-3">
+            {/* Render chat content here, e.g.: */}
+            <p>{chat.title}</p>
+            <p>{chat.messages}</p>
+          </div>
+        ))}
       <InfiniteScroll
         isManual
         hasNextPage={hasNextPage}
