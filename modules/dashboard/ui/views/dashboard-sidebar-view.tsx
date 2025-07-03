@@ -7,6 +7,8 @@ import { DashboardUserButton } from "../components/dashboard-user-button";
 import { HydrateClient, trpc } from "@/trpc/server";
 import { Suspense } from "react";
 import { DEFAULT_LIMIT, DEFAULT_PROJECT_LIMIT } from "@/constants";
+import { Separator } from "@/components/ui/separator";
+import { DashboardHeader } from "../components/dashboard-header";
 
 // server components
 const DashboardSidebarView = async () => {
@@ -19,18 +21,8 @@ const DashboardSidebarView = async () => {
   });
   return (
     <Sidebar>
-      <SidebarHeader className="text-sidebar-accent-foreground">
-        <Link href="/" className="flex items-center px-2 ">
-          <Image src="/logo.svg" height={36} width={36} alt="Chatgpt-bd Logo" />
-          <div className="relative -translate-y-[3px]  ">
-            <span className="block text-xl font-semibold leading-none">
-              CHATGPT
-            </span>
-            <span className="absolute top-3.5 left-0.5 text-[10px] font-bold">
-              BD
-            </span>
-          </div>
-        </Link>
+      <SidebarHeader className="text-sidebar-accent-foreground ">
+        <DashboardHeader />
       </SidebarHeader>
       <HydrateClient>
         <Suspense fallback={<p>Loading...</p>}>
@@ -39,6 +31,9 @@ const DashboardSidebarView = async () => {
           </ErrorBoundary>
         </Suspense>
       </HydrateClient>
+      <SidebarFooter>
+        <DashboardUserButton />
+      </SidebarFooter>
     </Sidebar>
   );
 };
