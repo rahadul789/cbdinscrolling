@@ -39,7 +39,6 @@ const ChatSectionSuspense = ({ chatId }: ChatSectionProps) => {
       }
     );
 
-  console.log(data);
   return (
     <div>
       {data.pages

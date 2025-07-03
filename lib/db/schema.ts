@@ -17,6 +17,11 @@ import {
   boolean,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -98,6 +103,10 @@ export const projects = pgTable(
   },
   (t) => [uniqueIndex("name_idx").on(t.name)]
 );
+
+export const projectInsertSchema = createInsertSchema(projects);
+export const projectUpdateSchema = createUpdateSchema(projects);
+export const projectSelectSchema = createSelectSchema(projects);
 
 export const projectRelations = relations(user, ({ many }) => ({
   chats: many(chats),
