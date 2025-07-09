@@ -10,15 +10,15 @@ interface PageParams {
 
 const page = async ({ params }: { params: Promise<PageParams> }) => {
   const { chatId } = await params;
-  void trpc.chats.getMany.prefetchInfinite({
-    limit: DEFAULT_LIMIT,
-  });
+  // void trpc.chats.getMany.prefetchInfinite({
+  //   limit: DEFAULT_LIMIT,
+  // });
 
   return (
     <div>
-      <HydrateClient>
-        <HomeView chatId={chatId} />
-      </HydrateClient>
+      {/* <HydrateClient> */}
+      <HomeView chatId={chatId} />
+      {/* </HydrateClient> */}
     </div>
   );
 };

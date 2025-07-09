@@ -20,42 +20,40 @@ export const ChatSection = ({ chatId }: ChatSectionProps) => {
   // })
   // create.pending
   return (
-    <Suspense fallback={<p>Loading...</p>}>
-      <ErrorBoundary fallback={<p>Error</p>}>
-        <ChatSectionSuspense chatId={chatId} />
-      </ErrorBoundary>
-    </Suspense>
+    // <Suspense fallback={<p>Loading...</p>}>
+    // <ErrorBoundary fallback={<p>Error</p>}>
+    <ChatSectionSuspense chatId={chatId} />
+    // </ErrorBoundary>
+    // </Suspense>
   );
 };
 
 const ChatSectionSuspense = ({ chatId }: ChatSectionProps) => {
-  const [data, { hasNextPage, isFetchingNextPage, fetchNextPage }] =
-    trpc.chats.getMany.useSuspenseInfiniteQuery(
-      {
-        limit: DEFAULT_LIMIT,
-      },
-      {
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      }
-    );
+  // const [data, { hasNextPage, isFetchingNextPage, fetchNextPage }] =
+  //   trpc.chats.getMany.useSuspenseInfiniteQuery(
+  //     {
+  //       limit: DEFAULT_LIMIT,
+  //     },
+  //     {
+  //       getNextPageParam: (lastPage) => lastPage.nextCursor,
+  //     }
+  //   );
 
   return (
     <div>
-      {data.pages
+      {/* {data.pages
         .flatMap((page) => page.items)
         .map((chat) => (
           <div key={chat.id} className=" border py-3">
-            {/* Render chat content here, e.g.: */}
             <p>{chat.title}</p>
-            <p>{chat.messages}</p>
           </div>
-        ))}
-      <InfiniteScroll
+        ))} */}
+      {/* <InfiniteScroll
         isManual
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
         fetchNextPage={fetchNextPage}
-      />
+      /> */}
     </div>
   );
 };

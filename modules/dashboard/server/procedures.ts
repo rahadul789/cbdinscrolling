@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { z } from "zod";
-import { chats, projects } from "@/lib/db/schema";
+import { chats, playlistChats, projects } from "@/lib/db/schema";
 import {
   baseProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, lt, or } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, notExists, or } from "drizzle-orm";
 
 export const ChatsRouter = createTRPCRouter({
   getMany: protectedProcedure
@@ -24,12 +24,19 @@ export const ChatsRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const { cursor, limit } = input;
+
       const data = await db
         .select()
         .from(chats)
         .where(
           and(
             eq(chats.userId, ctx.auth.user.id),
+            notExists(
+              db
+                .select()
+                .from(playlistChats)
+                .where(eq(playlistChats.chatId, chats.id))
+            ),
             cursor
               ? or(
                   lt(chats.updatedAt, cursor.updatedAt),

@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 import {
   Sidebar,
@@ -24,6 +24,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Edit,
+  FilePlus2Icon,
   FolderClosedIcon,
   MoreHorizontalIcon,
   ShareIcon,
@@ -34,11 +35,11 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/client";
 import { DEFAULT_PROJECT_LIMIT } from "@/constants";
 import { InfiniteScroll } from "@/components/infinite-scroll";
-import { ProjectCreateModal } from "./project-create-modal";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { ProjectNameUpdateForm } from "./project-name-update-form";
 import { useState } from "react";
+import { ProjectCreateModal } from "./project-create-modal";
+import { Button } from "@/components/ui/button";
+import { ProjectNameUpdateForm } from "./project-name-update-form";
 
 const ProjectFolders = () => {
   const pathname = usePathname();
@@ -51,7 +52,7 @@ const ProjectFolders = () => {
       isFetchingNextPage: projectIsFetchingNextPage,
       fetchNextPage: projectFetchNextPage,
     },
-  ] = trpc.projects.getMany.useSuspenseInfiniteQuery(
+  ] = trpc.projects.getProjects.useSuspenseInfiniteQuery(
     {
       limit: DEFAULT_PROJECT_LIMIT,
     },
@@ -63,16 +64,38 @@ const ProjectFolders = () => {
   const utils = trpc.useUtils();
   const removeProject = trpc.projects.remove.useMutation({
     onSuccess: ({ name }) => {
-      toast(`${name}  Created successfully`);
-      utils.projects.getMany.invalidate();
+      toast(`${name}  removed successfully`);
+      utils.projects.getProjects.invalidate();
+      utils.projects.getAddToProject.invalidate();
     },
   });
 
   const [isEdit, setIsEdit] = useState<string | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+
+  const isPending = false;
 
   return (
     <>
-      <ProjectCreateModal />
+      <ProjectCreateModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+      />
+      <SidebarMenuItem>
+        <SidebarMenuButton asChild className={cn("cursor-pointer")}>
+          <Button
+            onClick={() => setCreateModalOpen(true)}
+            variant="ghost"
+            className=" justify-start bg-transparent ml-0 pl-0"
+            disabled={isPending}
+          >
+            <>
+              <FilePlus2Icon size={16} className=" -translate-y-[2px]" />
+              New project
+            </>
+          </Button>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
 
       {projectData.pages
         .flatMap((page) => page.items)
@@ -92,10 +115,31 @@ const ProjectFolders = () => {
                     " cursor-pointer"
                     // pathname == item.href && "bg-border"
                   )}
-                  isActive={pathname === "/c/" + project.id}
+                  isActive={
+                    pathname ===
+                    "/g/g-p-" +
+                      project.id +
+                      "-" +
+                      project.name
+                        .replace(/\s+/g, "-")
+                        .toLowerCase()
+                        .replace(/[^a-z0-9-]/g, "") +
+                      "/project"
+                  }
                   // onClick={() => onSelect(project.id)}
                 >
-                  <div>
+                  <Link
+                    href={
+                      "/g/g-p-" +
+                      project.id +
+                      "-" +
+                      project.name
+                        .replace(/\s+/g, "-")
+                        .toLowerCase()
+                        .replace(/[^a-z0-9-]/g, "") +
+                      "/project"
+                    }
+                  >
                     <FolderClosedIcon
                       size={16}
                       className=" -translate-y-[2px]"
@@ -103,7 +147,7 @@ const ProjectFolders = () => {
                     <span className=" text-sm font-medium tracking-tight ">
                       {project.name}
                     </span>
-                  </div>
+                  </Link>
                 </SidebarMenuButton>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -122,7 +166,7 @@ const ProjectFolders = () => {
                   >
                     <DropdownMenuItem onClick={() => setIsEdit(project.id)}>
                       <Edit />
-                      <span>Edit</span>
+                      <span>Rename</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
                       <ShareIcon />

@@ -1,8 +1,8 @@
-import { ChatsRouter } from "@/modules/dashboard/server/procedures";
 import { createTRPCRouter } from "../init";
 
-import { projectsRouter } from "@/modules/projects/server/procedures";
 import { ChatRouter } from "@/modules/c/server/procedures";
+import { ChatsRouter } from "@/modules/chats/server/procedures";
+import { projectsRouter } from "@/modules/projects/server/procedures";
 export const appRouter = createTRPCRouter({
   chat: ChatRouter,
   chats: ChatsRouter,
