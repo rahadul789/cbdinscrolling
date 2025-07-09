@@ -17,36 +17,35 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-interface ProjectNameUpdateProps {
+interface ChatNameUpdateProps {
   id: string;
-  name: string;
+  title: string;
   setIsEdit: (value: string | null) => void;
 }
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  title: z.string().min(1, "Title is required"),
 });
 
-export const ProjectNameUpdateForm = ({
+export const ChatNameUpdateForm = ({
   id,
-  name,
+  title,
   setIsEdit,
-}: ProjectNameUpdateProps) => {
+}: ChatNameUpdateProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: name ?? "Untitled",
+      title: title ?? "Untitled",
     },
   });
 
   const utils = trpc.useUtils();
-  const updateName = trpc.projects.update.useMutation({
-    onSuccess: ({ name }) => {
-      utils.projects.getProjects.invalidate();
-      utils.projects.getAddToProject.invalidate();
-      utils.projects.getProject.invalidate({ id: id });
-      toast(`${name}  updated successfully`);
+  const updateTitle = trpc.chats.update.useMutation({
+    onSuccess: ({ title }) => {
+      utils.chats.getChats.invalidate();
+      utils.projects.getProjectChats.invalidate();
+      toast(`${title}  updated successfully`);
       setIsEdit(null);
     },
     onError: () => {
@@ -54,19 +53,19 @@ export const ProjectNameUpdateForm = ({
     },
   });
 
-  const isPending = updateName.isPending;
+  const isPending = updateTitle.isPending;
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    const trimmed = values.name.trim();
-    const original = name.trim();
+    const trimmed = values.title.trim();
+    const original = title.trim();
 
     if (trimmed === original) {
       setIsEdit(null); // just close edit mode
       return;
     }
 
-    updateName.mutate({ id, name: trimmed });
-    // updateName.mutate({ ...values, id: id });
+    updateTitle.mutate({ id, title: trimmed });
+    // updateTitle.mutate({ ...values, id: id });
   };
 
   useEffect(() => {
@@ -78,7 +77,7 @@ export const ProjectNameUpdateForm = ({
       <Form {...form}>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
-            name="name"
+            name="title"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -87,12 +86,12 @@ export const ProjectNameUpdateForm = ({
                     {...field}
                     ref={inputRef}
                     onBlur={() => {
-                      const value = form.getValues("name").trim();
+                      const value = form.getValues("title").trim();
                       if (!value) {
-                        form.setValue("name", "Untitled");
-                        onSubmit({ name: "Untitled" });
+                        form.setValue("title", "Untitled");
+                        onSubmit({ title: "Untitled" });
                       } else {
-                        onSubmit({ name: value });
+                        onSubmit({ title: value });
                       }
                     }}
                   />

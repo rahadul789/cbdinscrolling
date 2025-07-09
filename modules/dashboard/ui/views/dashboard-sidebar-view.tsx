@@ -12,13 +12,18 @@ import { DashboardHeader } from "../components/dashboard-header";
 
 // server components
 const DashboardSidebarView = async () => {
-  void trpc.chats.getMany.prefetchInfinite({
-    limit: DEFAULT_LIMIT,
-  });
+  // void trpc.chats.getMany.prefetchInfinite({
+  //   limit: DEFAULT_LIMIT,
+  // });
 
-  void trpc.projects.getMany.prefetchInfinite({
+  void trpc.projects.getProjects.prefetchInfinite({
     limit: DEFAULT_PROJECT_LIMIT,
   });
+
+  void trpc.chats.getChats.prefetchInfinite({
+    limit: DEFAULT_PROJECT_LIMIT,
+  });
+
   return (
     <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground ">

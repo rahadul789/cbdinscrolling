@@ -9,6 +9,11 @@ import {
   uniqueIndex,
   primaryKey,
 } from "drizzle-orm/pg-core";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -29,6 +34,7 @@ export const user = pgTable("user", {
 export const userRelations = relations(user, ({ many }) => ({
   chats: many(chats),
   projects: many(projects),
+  playlists: many(playlists),
 }));
 
 export const session = pgTable("session", {
@@ -76,6 +82,33 @@ export const verification = pgTable("verification", {
 });
 /////////////////////////////////////////////////////////////////////////
 
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull().unique(),
+    description: text("description"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("name_idx").on(t.name)]
+);
+
+export const projectInsertSchema = createInsertSchema(projects);
+export const projectUpdateSchema = createUpdateSchema(projects);
+export const projectSelectSchema = createSelectSchema(projects);
+
+export const projectRelations = relations(projects, ({ one, many }) => ({
+  chats: many(chats),
+  user: one(user, {
+    fields: [projects.userId],
+    references: [user.id],
+  }),
+}));
+
 export const chats = pgTable(
   "chats",
   {
@@ -86,7 +119,9 @@ export const chats = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-
+    projectId: uuid("project_id").references(() => projects.id, {
+      onDelete: "cascade",
+    }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   }
@@ -98,35 +133,37 @@ export const chatRelations = relations(chats, ({ one, many }) => ({
     fields: [chats.userId],
     references: [user.id],
   }),
-  projectChats: many(projectChats),
+  project: one(projects, {
+    fields: [chats.projectId],
+    references: [projects.id],
+  }),
+  playlistChats: many(playlistChats), // eta na dilew hoto.. name thik korar jonno disilo video te. But amr agee thekey kaz korchilo // eta comment kore dilew problem hoy na
 }));
 
-export const projects = pgTable("projects", {
+export const playlists = pgTable("playlists", {
   id: uuid("id").primaryKey().defaultRandom(),
-  url: text("url").notNull(),
   name: text("name").notNull(),
   description: text("description"),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const projectRelations = relations(projects, ({ one, many }) => ({
+export const playlistRelations = relations(playlists, ({ one, many }) => ({
   user: one(user, {
-    fields: [projects.userId],
+    fields: [playlists.userId],
     references: [user.id],
   }),
-  projectChats: many(projectChats),
+  playlistChats: many(playlistChats),
 }));
 
-export const projectChats = pgTable(
-  "project_chats",
+export const playlistChats = pgTable(
+  "playlist_chats",
   {
-    projectId: uuid("project_id")
-      .references(() => projects.id, { onDelete: "cascade" })
+    playlistId: uuid("playlist_id")
+      .references(() => playlists.id, { onDelete: "cascade" })
       .notNull(),
     chatId: uuid("chat_id")
       .references(() => chats.id, { onDelete: "cascade" })
@@ -136,19 +173,19 @@ export const projectChats = pgTable(
   },
   (t) => [
     primaryKey({
-      name: "project_chats_pk",
-      columns: [t.projectId, t.chatId],
+      name: "playlist_chats_pk",
+      columns: [t.playlistId, t.chatId],
     }),
   ]
 );
 
-export const projectChatRelations = relations(projectChats, ({ one }) => ({
-  project: one(projects, {
-    fields: [projectChats.projectId],
-    references: [projects.id],
+export const playlistChatRelations = relations(playlistChats, ({ one }) => ({
+  playlist: one(playlists, {
+    fields: [playlistChats.playlistId],
+    references: [playlists.id],
   }),
   chat: one(chats, {
-    fields: [projectChats.chatId],
+    fields: [playlistChats.chatId],
     references: [chats.id],
   }),
 }));
