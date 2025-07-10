@@ -24,6 +24,10 @@ const DashboardSidebarView = async () => {
     limit: DEFAULT_PROJECT_LIMIT,
   });
 
+  // void trpc.search.getMany.prefetchInfinite({
+  //   limit: DEFAULT_PROJECT_LIMIT,
+  // });
+
   return (
     <Sidebar>
       <SidebarHeader className="text-sidebar-accent-foreground ">

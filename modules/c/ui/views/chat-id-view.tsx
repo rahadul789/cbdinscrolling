@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const ChatIdView = ({ chatId }: Props) => {
-  const [data] = trpc.chat.getOne.useSuspenseQuery({ id: chatId });
+  const [data] = trpc.chats.getOne.useSuspenseQuery({ id: chatId });
   // const [isopenPlaylistAddModal, setIsopenPlaylistAddModal] = useState(false);
   return (
     <div>
