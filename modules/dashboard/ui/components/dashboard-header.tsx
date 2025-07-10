@@ -1,11 +1,27 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Edit, FilePlus2Icon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { DashboardCommand } from "./dashboard-command";
 
 export const DashboardHeader = () => {
+  const [commandOpen, setCommandOpen] = useState(false);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setCommandOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
   return (
     <div>
       <Link href="/" className="flex items-center px-2 my-2 ">
@@ -28,17 +44,24 @@ export const DashboardHeader = () => {
           </>
         </Link>
       </Button>
-      <Button
-        variant="ghost"
-        className=" justify-start bg-transparent ml-0 pl-0 w-full"
-      >
-        <Link href="/?model=gpt-4o" className=" flex items-center gap-2 pl-2">
-          <>
-            <SearchIcon size={16} className=" -translate-y-[1px]" />
+      <DashboardCommand open={commandOpen} setOpen={setCommandOpen} />
+      <div className="group">
+        <Button
+          variant="ghost"
+          className="justify-start pl-2 w-full "
+          onClick={() => {
+            setCommandOpen(true);
+          }}
+        >
+          <div className=" flex items-center gap-2">
+            <SearchIcon size={16} className="-translate-y-[1px]" />
             Search chats
-          </>
-        </Link>
-      </Button>
+          </div>
+          <kbd className="ml-auto  group-hover:block hidden text-muted-foreground">
+            <span className="text-xs  ">&#8984;</span>K
+          </kbd>
+        </Button>
+      </div>
       <div className="mt-2">
         <Separator />
       </div>

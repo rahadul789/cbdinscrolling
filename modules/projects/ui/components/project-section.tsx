@@ -86,13 +86,13 @@ const ProjectFolders = () => {
           <Button
             onClick={() => setCreateModalOpen(true)}
             variant="ghost"
-            className=" justify-start bg-transparent ml-0 pl-0"
+            className=" justify-start bg-transparent  pl-2"
             disabled={isPending}
           >
-            <>
+            <div className=" flex items-center gap-2">
               <FilePlus2Icon size={16} className=" -translate-y-[2px]" />
               New project
-            </>
+            </div>
           </Button>
         </SidebarMenuButton>
       </SidebarMenuItem>

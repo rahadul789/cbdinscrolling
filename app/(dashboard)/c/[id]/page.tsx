@@ -11,7 +11,7 @@ interface PageParams {
 
 const page = async ({ params }: { params: Promise<PageParams> }) => {
   const { id } = await params;
-  void trpc.chat.getOne.prefetch({ id });
+  void trpc.chats.getOne.prefetch({ id });
 
   return (
     <HydrateClient>

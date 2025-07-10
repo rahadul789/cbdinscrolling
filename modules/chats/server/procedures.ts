@@ -10,6 +10,26 @@ import { TRPCError } from "@trpc/server";
 import { and, desc, eq, inArray, lt, notExists, or } from "drizzle-orm";
 
 export const ChatsRouter = createTRPCRouter({
+  getOne: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ input, ctx }) => {
+      const { id } = input;
+      const [existingChat] = await db
+        .select
+        // { ...getTableColumns(chats), user: {...getTableColumns(user)} } // its like spread(...) operatot
+        ()
+        .from(chats)
+        // .innerJoin(user, eq(chats.userId, user.id)) // this is working like populate
+        .where(and(eq(chats.id, id), eq(chats.userId, ctx.auth.user.id)));
+
+      if (!existingChat) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No chats found",
+        });
+      }
+      return existingChat;
+    }),
   getChats: protectedProcedure
     .input(
       z.object({
@@ -171,34 +191,4 @@ export const ChatsRouter = createTRPCRouter({
 
       return updatedChat;
     }),
-
-  // MOVE CHAT FROM ONE PROJECT TO ANOTHER PROJECT
-  // moveChat: protectedProcedure
-  //   .input(z.object({ name: z.string(), id: z.string().uuid() }))
-  //   .mutation(async ({ ctx, input }) => {
-  //     if (!input.id) {
-  //       throw new TRPCError({
-  //         code: "BAD_REQUEST",
-  //         message: "Project id is required",
-  //       });
-  //     }
-  //     const [updatedChat] = await db
-  //       .update(projects)
-  //       .set({
-  //         name: input.name,
-  //       })
-  //       .where(
-  //         and(eq(projects.id, input.id), eq(projects.userId, ctx.auth.user.id))
-  //       )
-  //       .returning();
-
-  //     if (!updatedChat) {
-  //       throw new TRPCError({
-  //         code: "NOT_FOUND",
-  //         message: "Chat not found",
-  //       });
-  //     }
-
-  //     return updatedChat;
-  //   }),
 });
