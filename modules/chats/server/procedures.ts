@@ -87,7 +87,7 @@ export const ChatsRouter = createTRPCRouter({
       };
     }),
 
-  // REMOVE CHAT FROM PROJECT
+  // REMOVE CHAT FROM PROJECTs
   removeChat: protectedProcedure
     .input(
       z.object({
